@@ -30,6 +30,9 @@ class ServiceNotificationEvent {
   /// notification title
   String? title;
 
+  /// notification subText
+  String? subText;
+
   /// the notification app icon
   /// To display an image simply use the [Image.memory] widget.
   /// Example:
@@ -50,6 +53,7 @@ class ServiceNotificationEvent {
     this.extrasPicture,
     this.packageName,
     this.title,
+    this.subText,
     this.notificationIcon,
     this.content,
   });
@@ -62,6 +66,7 @@ class ServiceNotificationEvent {
     extrasPicture = map['notificationExtrasPicture'];
     packageName = map['packageName'];
     title = map['title'];
+    subText = map['subText'];
     notificationIcon = map['notificationIcon'];
     content = map['content'];
   }
@@ -87,6 +92,7 @@ class ServiceNotificationEvent {
       can reply: $canReply
       packageName: $packageName
       title: $title
+      subText: $subText
       content: $content
       hasRemoved: $hasRemoved
       hasExtrasPicture: $hasExtrasPicture

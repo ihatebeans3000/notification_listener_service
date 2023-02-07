@@ -13,6 +13,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -60,9 +61,11 @@ public class NotificationListener extends NotificationListenerService {
         if (extras != null) {
             CharSequence title = extras.getCharSequence(Notification.EXTRA_TITLE);
             CharSequence text = extras.getCharSequence(Notification.EXTRA_TEXT);
+            CharSequence subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
 
             intent.putExtra(NotificationConstants.NOTIFICATION_TITLE, title == null ? null : title.toString());
             intent.putExtra(NotificationConstants.NOTIFICATION_CONTENT, text == null ? null : text.toString());
+            intent.putExtra(NotificationConstants.NOTIFICATION_SUBTEXT, subText == null ? null : subText.toString());
             intent.putExtra(NotificationConstants.IS_REMOVED, isRemoved);
             intent.putExtra(NotificationConstants.HAS_EXTRAS_PICTURE, extras.containsKey(Notification.EXTRA_PICTURE));
 
@@ -85,7 +88,6 @@ public class NotificationListener extends NotificationListenerService {
             getBitmapFromDrawable(icon).compress(Bitmap.CompressFormat.PNG, 100, stream);
             return stream.toByteArray();
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
             return null;
         }
     }
