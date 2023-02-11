@@ -5,8 +5,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:notification_listener_service/notification_event.dart';
 
-const MethodChannel methodeChannel =
-    MethodChannel('x-slayer/notifications_channel');
+const MethodChannel methodeChannel = MethodChannel('x-slayer/notifications_channel');
 const EventChannel _eventChannel = EventChannel('x-slayer/notifications_event');
 Stream<ServiceNotificationEvent>? _stream;
 
@@ -16,10 +15,11 @@ class NotificationListenerService {
   /// stream the incoming notifications events
   static Stream<ServiceNotificationEvent> get notificationsStream {
     if (Platform.isAndroid) {
-      _stream ??=
-          _eventChannel.receiveBroadcastStream().map<ServiceNotificationEvent>(
-                (event) => ServiceNotificationEvent.fromMap(event),
-              );
+      _stream ??= _eventChannel.receiveBroadcastStream().map<ServiceNotificationEvent>(
+        (event) {
+          return ServiceNotificationEvent.fromMap(event);
+        },
+      );
       return _stream!;
     }
     throw Exception("Notifications API exclusively available on Android!");

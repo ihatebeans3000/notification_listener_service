@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:notification_listener_service/notification_event.dart';
 import 'package:notification_listener_service/notification_listener_service.dart';
 
+const KAKAO_PACKAGE = 'com.kakao.talk';
+
 void main() {
   runApp(const MyApp());
 }
@@ -43,8 +45,7 @@ class _MyAppState extends State<MyApp> {
                   children: [
                     TextButton(
                       onPressed: () async {
-                        final res = await NotificationListenerService
-                            .requestPermission();
+                        final res = await NotificationListenerService.requestPermission();
                         log("Is enabled: $res");
                       },
                       child: const Text("Request Permission"),
@@ -52,8 +53,7 @@ class _MyAppState extends State<MyApp> {
                     const SizedBox(height: 20.0),
                     TextButton(
                       onPressed: () async {
-                        final bool res = await NotificationListenerService
-                            .isPermissionGranted();
+                        final bool res = await NotificationListenerService.isPermissionGranted();
                         log("Is enabled: $res");
                       },
                       child: const Text("Check Permission"),
@@ -61,13 +61,15 @@ class _MyAppState extends State<MyApp> {
                     const SizedBox(height: 20.0),
                     TextButton(
                       onPressed: () {
-                        _subscription = NotificationListenerService
-                            .notificationsStream
-                            .listen((event) {
-                          log("$event");
-                          setState(() {
-                            events.add(event);
-                          });
+                        _subscription = NotificationListenerService.notificationsStream.listen((event) {
+                          bool isKakao = event.packageName == KAKAO_PACKAGE;
+                          bool canReply = event.canReply ?? false;
+                          bool hasRemoved = event.hasRemoved ?? true;
+                          if (isKakao && canReply && !hasRemoved) {
+                            log('event occured $event');
+                            String content = event.content ?? '';
+                            event.sendReply(content);
+                          }
                         });
                       },
                       child: const Text("Start Stream"),
@@ -91,8 +93,7 @@ class _MyAppState extends State<MyApp> {
                     child: ListTile(
                       onTap: () async {
                         try {
-                          await events[index]
-                              .sendReply("This is an auto response");
+                          await events[index].sendReply("This is an auto response");
                         } catch (e) {
                           log(e.toString());
                         }
@@ -103,11 +104,6 @@ class _MyAppState extends State<MyApp> {
                               style: TextStyle(color: Colors.red),
                             )
                           : const SizedBox.shrink(),
-                      leading: Image.memory(
-                        events[index].notificationIcon!,
-                        width: 35.0,
-                        height: 35.0,
-                      ),
                       title: Text(events[index].title ?? "No title"),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
