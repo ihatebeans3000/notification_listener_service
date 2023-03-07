@@ -9,6 +9,7 @@ import androidx.core.app.RemoteInput;
 /**
  * Created by JJ on 05/08/15.
  */
+
 public class RemoteInputParcel implements Parcelable {
 
     private String label;

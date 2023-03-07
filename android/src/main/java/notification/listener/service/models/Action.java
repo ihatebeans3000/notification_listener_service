@@ -14,7 +14,6 @@ import androidx.core.app.RemoteInput;
 import java.util.ArrayList;
 
 public class Action implements Parcelable {
-
     private final String text;
     private final String packageName;
     private final PendingIntent p;
@@ -38,22 +37,15 @@ public class Action implements Parcelable {
         dest.writeTypedList(remoteInputs);
     }
 
-    public Action(String text, String packageName, PendingIntent p, RemoteInput remoteInput, boolean isQuickReply) {
-        this.text = text;
-        this.packageName = packageName;
-        this.p = p;
-        this.isQuickReply = isQuickReply;
-        remoteInputs.add(new RemoteInputParcel(remoteInput));
-    }
-
     public Action(NotificationCompat.Action action, String packageName, boolean isQuickReply) {
         this.text = action.title.toString();
         this.packageName = packageName;
         this.p = action.actionIntent;
         if (action.getRemoteInputs() != null) {
             int size = action.getRemoteInputs().length;
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++) {
                 remoteInputs.add(new RemoteInputParcel(action.getRemoteInputs()[i]));
+            }
         }
         this.isQuickReply = isQuickReply;
     }
@@ -64,7 +56,6 @@ public class Action implements Parcelable {
         ArrayList<RemoteInput> actualInputs = new ArrayList<>();
 
         for (RemoteInputParcel input : remoteInputs) {
-            Log.i("", "RemoteInput: " + input);
             bundle.putCharSequence(input.getResultKey(), msg);
             RemoteInput.Builder builder = new RemoteInput.Builder(input.getResultKey());
             builder.setLabel(input.getLabel());
@@ -77,27 +68,6 @@ public class Action implements Parcelable {
         RemoteInput[] inputs = actualInputs.toArray(new RemoteInput[actualInputs.size()]);
         RemoteInput.addResultsToIntent(inputs, intent, bundle);
         p.send(context, 0, intent);
-        p.cancel();
-    }
-
-    public ArrayList<RemoteInputParcel> getRemoteInputs() {
-        return remoteInputs;
-    }
-
-    public boolean isQuickReply() {
-        return isQuickReply;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public PendingIntent getQuickReplyIntent() {
-        return isQuickReply ? p : null;
-    }
-
-    public String getPackageName() {
-        return packageName;
     }
 
     @Override

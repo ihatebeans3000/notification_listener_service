@@ -5,12 +5,14 @@ import static notification.listener.service.models.ActionCache.cachedNotificatio
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -29,7 +31,6 @@ public class NotificationListener extends NotificationListenerService {
     @RequiresApi(api = VERSION_CODES.LOLLIPOP)
     @Override
     public void onNotificationPosted(StatusBarNotification notification) {
-        Log.d("onNotificationPosted", "onNotificationPosted: occurred"+notification.getNotification().extras);
         handleNotification(notification, false);
     }
 
@@ -41,8 +42,8 @@ public class NotificationListener extends NotificationListenerService {
 
     @RequiresApi(api = VERSION_CODES.LOLLIPOP)
     @Override
-    public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
-        super.onNotificationPosted(sbn, rankingMap);
+    public void onNotificationPosted(StatusBarNotification notification, RankingMap rankingMap) {
+        super.onNotificationPosted(notification, rankingMap);
     }
 
 
@@ -51,13 +52,14 @@ public class NotificationListener extends NotificationListenerService {
 
         String packageName = notification.getPackageName();
         Bundle extras = notification.getNotification().extras;
+
         byte[] drawable = getSmallIcon(packageName);
 
         Action action = NotificationUtils.getQuickReplyAction(notification.getNotification(), packageName);
-
         if(action == null){
             return;
         }
+
 
         Intent intent = new Intent(NotificationConstants.INTENT);
         intent.putExtra(NotificationConstants.PACKAGE_NAME, packageName);
@@ -71,6 +73,7 @@ public class NotificationListener extends NotificationListenerService {
         intent.putExtra(NotificationConstants.NOTIFICATIONS_ICON, drawable);
 
         if (extras != null) {
+
             CharSequence title = extras.getCharSequence(Notification.EXTRA_TITLE);
             CharSequence text = extras.getCharSequence(Notification.EXTRA_TEXT);
             CharSequence subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
@@ -87,8 +90,9 @@ public class NotificationListener extends NotificationListenerService {
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 intent.putExtra(NotificationConstants.EXTRAS_PICTURE, stream.toByteArray());
             }
+            sendBroadcast(intent);
+            Log.d("'notification'", "notification handled: "+"id : "+notification.getId()+extras.toString());
         }
-        sendBroadcast(intent);
     }
 
 
@@ -104,4 +108,9 @@ public class NotificationListener extends NotificationListenerService {
         }
     }
 
+    @Override
+    public void onNotificationChannelModified(String pkg, UserHandle user, NotificationChannel channel, int modificationType) {
+        Log.d("'notification'", "onNotificationChannelModified"+pkg);
+        super.onNotificationChannelModified(pkg, user, channel, modificationType);
+    }
 }
