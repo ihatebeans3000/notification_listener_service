@@ -1,6 +1,5 @@
 package notification.listener.service;
 
-import static notification.listener.service.NotificationUtils.isPermissionGranted;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -23,6 +22,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import notification.listener.service.models.Action;
 import notification.listener.service.models.ActionCache;
+import static notification.listener.service.NotificationUtils.isPermissionGranted;
 
 
 public class NotificationListenerServicePlugin implements FlutterPlugin, ActivityAware, MethodCallHandler, PluginRegistry.ActivityResultListener, EventChannel.StreamHandler {
